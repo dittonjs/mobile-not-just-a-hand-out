@@ -24,6 +24,14 @@ static navigationOptions= ({navigation}) =>({
 	  color="blue"
 	  title="Food"
 	  />
+
+	  <Button
+	  onPress={() => this.setState({
+              showGoodOnly: !this.state.showGoodOnly
+            })}
+	  color="blue"
+	  title="Medical Services"
+	  />
       </View>
 		);
 	}
