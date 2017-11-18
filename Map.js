@@ -13,7 +13,7 @@ const LATITUDE = 40.7591642;
 const LONGITUDE = -111.879133;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-var colors = { 
+var colors = {
 	'Medical Resource': 'red',
 	'Emergency Shelter': 'orange',
 	'Food Pantry': 'lightsteelblue',
@@ -30,14 +30,14 @@ var colors = {
 
 export default class Map extends Component{
 static navigationOptions= ({navigation}) =>({
-		  title: 'Map',	
-	});  
+		  title: 'Map',
+	});
 
 	constructor(props) {
     super(props);
     State.subscribe(this)
-    fetch('http://localhost:8000/resources').then((res) => {
-    	
+    fetch('http://ec2-184-73-79-249.compute-1.amazonaws.com:8000/resources').then((res) => {
+
       const result = JSON.parse(res['_bodyText']);
       const promises = result.map((resource) => {
         const { street, city, state, zip } = resource.address;
@@ -89,14 +89,14 @@ static navigationOptions= ({navigation}) =>({
 
   	},(error) => alert(JSON.stringify(error)), {
   		enableHighAccuracy: true,
-  		timeout: 20000, 
+  		timeout: 20000,
   		maximumAge: 1000
   	})
 
   	this.watchID = navigator.geolocation.watchPosition((position) => {
 			var lat = parseFloat(position.coords.latitude)
 			var long = parseFloat(position.coords.longitude)
-  		
+
   		var lastRegion = {
   			latitude: lat,
   			longitude: long,
@@ -112,7 +112,7 @@ static navigationOptions= ({navigation}) =>({
   componentWillUnmount(){
   	navigator.geolocation.clearWatch(this.watchID)
   }
-  
+
   get resources(){
   	if(this.state.filters.length === 0){
   		return this.state.resources
@@ -129,7 +129,7 @@ static navigationOptions= ({navigation}) =>({
 	render(){
 		const { navigate } = this.props.navigation;
 		return(
-	  <View style={styles.container}>	
+	  <View style={styles.container}>
 	  	<MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
@@ -139,7 +139,7 @@ static navigationOptions= ({navigation}) =>({
           rotateEnabled={true}
           region={this.state.initialPosition}
       >
-          
+
           {this.resources.map((pin, index) =>
             <MapView.Marker
               coordinate={{
@@ -161,7 +161,7 @@ static navigationOptions= ({navigation}) =>({
             </MapView.Marker>
           )}
         </MapView>
-        
+
       </View>
 		);
 	}
