@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
@@ -27,26 +27,23 @@ export default class Analysis extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView
-          style={StyleSheet.absoluteFill}
-          contentContainerStyle={styles.scrollview}
+        <View style={styles.footer}>
+        </View>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          scrollEnabled={true}
+          zoomEnabled={true}
+          pitchEnabled={true}
+          rotateEnabled={true}
+          initialRegion={this.state.region}
         >
-          <MapView
-            provider={this.props.provider}
-            style={styles.map}
-            scrollEnabled={true}
-            zoomEnabled={true}
-            pitchEnabled={true}
-            rotateEnabled={true}
-            initialRegion={this.state.region}
-          >
-            <MapView.Marker
-              title="This is a title"
-              description="This is a description"
-              coordinate={this.state.region}
-            />
-          </MapView>
-        </ScrollView>
+          <MapView.Marker
+            title="This is a title"
+            description="This is a description"
+            coordinate={this.state.region}
+          />
+        </MapView>
       </View>
     );
   }
@@ -55,7 +52,6 @@ export default class Analysis extends React.Component {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   scrollview: {
@@ -63,7 +59,12 @@ const styles = StyleSheet.create({
   },
   map: {
     width: SCREEN_WIDTH,
-    height: height,
+    height: height - 75,
   },
+  footer: {
+    height: 75,
+    width: SCREEN_WIDTH,
+    backgroundColor: 'grey'
+  }
 });
 
