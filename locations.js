@@ -1,0 +1,1 @@
+//use this file to get locations from db
