@@ -27,6 +27,22 @@ static navigationOptions= ({navigation}) =>({
 
 	constructor(props) {
     super(props);
+    fetch('http://localhost:8000/resources').then((res) => {
+      const result = JSON.parse(res['_bodyText']);
+      const promises = result.map((resource) => {
+        const { street, city, state, zip } = resource.address;
+        const address = street + city + state + zip;
+        resource.address = address;
+        return fetch(`http://maps.google.com/maps/api/geocode/json?address=${address}`).then((res) => {
+          const {lat, lng} = JSON.parse(res._bodyText).results[0].geometry.location;
+          resource.coodinate = [lat, lng];
+        });
+      });
+      Promise.all(promises).then((results) => {
+        this.setState({ resources: result });
+      });
+    });
+    
     this.state = {
       region: {
         // latitude: LATITUDE,
