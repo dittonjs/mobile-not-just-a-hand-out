@@ -11,15 +11,30 @@ const LONGITUDE = -111.8111708;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-export default class home extends Component{
+export default class Home extends Component{
 static navigationOptions= ({navigation}) =>({
-		  title: 'Map',	
-	});  
+		  title: 'Map',
+	});
 
 	constructor(props) {
     super(props);
-
+    fetch('http://localhost:8000/resources').then((res) => {
+      const result = JSON.parse(res['_bodyText']);
+      const promises = result.map((resource) => {
+        const { street, city, state, zip } = resource.address;
+        const address = street + city + state + zip;
+        resource.address = address;
+        return fetch(`http://maps.google.com/maps/api/geocode/json?address=${address}`).then((res) => {
+          const {lat, lng} = JSON.parse(res._bodyText).results[0].geometry.location;
+          resource.coodinate = [lat, lng];
+        });
+      });
+      Promise.all(promises).then((results) => {
+        this.setState({ resources: result });
+      });
+    });
     this.state = {
+      resources: [],
       region: {
         latitude: LATITUDE,
         longitude: LONGITUDE,
@@ -28,12 +43,12 @@ static navigationOptions= ({navigation}) =>({
       },
     };
   }
-  
-	render(){
-		const { navigate } = this.props.navigation;
-		return(
-	  <View style={styles.container}>	
-	  	<MapView
+
+  render(){
+    const { navigate } = this.props.navigation;
+    return(
+    <View style={styles.container}>
+      <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           scrollEnabled={true}
@@ -48,7 +63,7 @@ static navigationOptions= ({navigation}) =>({
             coordinate={this.state.region}
           />
         </MapView>
-        
+
       </View>
 		);
 	}
