@@ -4,6 +4,7 @@ import { AppRegistry,Dimensions,View,Text,StyleSheet
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { pins } from './locations';
 import Callout from './callout';
+import State from './state';
 
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
@@ -17,7 +18,6 @@ var colors = {
 	'Emergency Shelters': 'green',
 	'Food Pantries': 'orange',
 	'Outreach Programs': 'red',
-
 	}
 
 export default class Map extends Component{
@@ -27,42 +27,53 @@ static navigationOptions= ({navigation}) =>({
 
 	constructor(props) {
     super(props);
+    State.subscribe(this)
     fetch('http://localhost:8000/resources').then((res) => {
+    	
       const result = JSON.parse(res['_bodyText']);
       const promises = result.map((resource) => {
         const { street, city, state, zip } = resource.address;
-        const address = street + city + state + zip;
+        const address = street + ' ' + city + ' ' + state + ' ' + zip;
         resource.address = address;
         return fetch(`http://maps.google.com/maps/api/geocode/json?address=${address}`).then((res) => {
           const {lat, lng} = JSON.parse(res._bodyText).results[0].geometry.location;
-          resource.coodinate = [lat, lng];
+          resource.coordinate = [lat, lng];
         });
       });
-      Promise.all(promises).then((results) => {
+      Promise.all(promises).then(() => {
         this.setState({ resources: result });
       });
     });
-    
+
     this.state = {
+    	resources:[],
+    	filters: State.filters,
       region: {
         // latitude: LATITUDE,
         // longitude: LONGITUDE,
         // latitudeDelta: LATITUDE_DELTA,
         // longitudeDelta: LONGITUDE_DELTA,
-        latitude: 40.77096,
-        longitude: -73.97702,
+        latitude: 40.7591642,
+        longitude: -111.879133,
         latitudeDelta: 0.0491,
         longitudeDelta: 0.0375,
-        // showShelters: false,
-        // showFood: false,
-        // showOutreach: false,
-        // showMedical: false,
-        // showRecovery: false,
-        // showHousing: false,
       },
     };
   }
   
+  get resources(){
+  	if(this.state.filters.length === 0){
+  		return this.state.resources
+  	}
+  	return this.state.resources.filter((resource)=> (
+  			this.state.filters.includes(resource.type)
+  		))
+  }
+
+  handleUpdate(filters){
+  	this.setState({filters})
+  }
+
 	render(){
 		const { navigate } = this.props.navigation;
 		return(
@@ -77,9 +88,8 @@ static navigationOptions= ({navigation}) =>({
           initialRegion={this.state.region}
       >
           
-          {pins.map((pin, index) =>
-            // If showGoodOnly is true, but the pin is bad - do not show it
-            this.state.showShelters && pin.type  || <MapView.Marker
+          {this.resources.map((pin, index) =>
+            <MapView.Marker
               coordinate={{
                 latitude: pin.coordinate[0],
                 longitude: pin.coordinate[1],
@@ -91,8 +101,9 @@ static navigationOptions= ({navigation}) =>({
             >
             <MapView.Callout tooltip style={styles.callout}>
                 <Callout
+                	type={pin.type}
                   name={pin.name}
-                  image={pin.image}
+                  address={pin.address}
                 />
               </MapView.Callout>
             </MapView.Marker>
@@ -107,10 +118,6 @@ const styles = StyleSheet.create({
 	container:{
 		display:'flex',alignItems:'center',
 		justifyContent:'center'
-	},
-	cat:{
-		backgroundColor:'orange',
-		padding:10,margin:10,width:'95%'
 	},
 	pageName:{
 		margin:10,fontWeight:'bold',

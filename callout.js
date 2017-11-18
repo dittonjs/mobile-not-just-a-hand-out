@@ -8,12 +8,14 @@ import {
 
 export default class Callout extends Component {
   render() {
-    const { name } = this.props;
+    const { type, name , address} = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.bubble}>
           <View>
+            <Text style={styles.name}>{type}</Text>
             <Text style={styles.name}>{name}</Text>
+            <Text style={styles.name}>{address}</Text>
           </View>
         </View>
         <View style={styles.arrowBorder} />

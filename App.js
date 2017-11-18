@@ -3,7 +3,6 @@ import { AppRegistry,View,Text,StyleSheet,ScrollView,TouchableOpacity } from 're
 import { StackNavigator,DrawerNavigator  } from 'react-navigation';
 
 import MapScreen from './Map';
-import Products from './products';
 import Filter from  './filter';
 
 const myDrawer = DrawerNavigator({
