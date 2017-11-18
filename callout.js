@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   bubble: {
     flexDirection: 'row',
     alignSelf: 'flex-start',
-    backgroundColor: '#fff',
+    backgroundColor: 'powderblue',
     borderRadius: 6,
     borderColor: '#ccc',
     borderWidth: 0.5,
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   arrow: {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
-    borderTopColor: '#fff',
+    borderTopColor: 'powderblue',
     borderWidth: 16,
     alignSelf: 'center',
     marginTop: -32,

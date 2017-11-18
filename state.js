@@ -1,5 +1,18 @@
 export default class State {
-	static filters = ['Emergency Shelters', 'Medical Resources', 'Outreach Programs', 'Food Pantries'];
+	static filters = [
+	'Emergency Shelter',
+	'Medical Resource',
+	'Outreach Program',
+	'Food Pantry',
+	'Event',
+	"Prepared Meals",
+	"Personal Care",
+	"Addiction Recovery",
+	"Education and Legal Service",
+	"Housing Service",
+	"Employment Service",
+	"Veteran Service"];
+
 	static subscribers = [];
 
 	static subscribe(component){
@@ -7,7 +20,6 @@ export default class State {
 	}
 
 	static notify(){
-		console.log(State.filters);
 		State.subscribers.forEach((sub) => {sub.handleUpdate(State.filters)})
 	}
 

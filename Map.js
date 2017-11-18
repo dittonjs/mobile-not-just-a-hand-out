@@ -9,15 +9,23 @@ import State from './state';
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
-const LATITUDE = 41.7418072;
-const LONGITUDE = -111.8111708;
+const LATITUDE = 40.7591642;
+const LONGITUDE = -111.879133;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 var colors = { 
-	'Medical Resources': 'blue',
-	'Emergency Shelters': 'green',
-	'Food Pantries': 'orange',
-	'Outreach Programs': 'red',
+	'Medical Resource': 'red',
+	'Emergency Shelter': 'orange',
+	'Food Pantry': 'lightsteelblue',
+	'Outreach Program': 'green',
+	'Event':'blue',
+	"Prepared Meals": 'purple',
+	"Personal Care":'pink',
+	"Addiction Recovery":'cyan',
+	"Education and Legal Service":'brown',
+	"Housing Service":'goldenrod',
+	"Employment Service":'magenta',
+	"Veteran Service":'darkgreen',
 	}
 
 export default class Map extends Component{
@@ -48,17 +56,61 @@ static navigationOptions= ({navigation}) =>({
     this.state = {
     	resources:[],
     	filters: State.filters,
-      region: {
-        // latitude: LATITUDE,
-        // longitude: LONGITUDE,
-        // latitudeDelta: LATITUDE_DELTA,
-        // longitudeDelta: LONGITUDE_DELTA,
-        latitude: 40.7591642,
-        longitude: -111.879133,
-        latitudeDelta: 0.0491,
-        longitudeDelta: 0.0375,
+
+      initialPosition: {
+      	latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      },
+      markerPosition: {
+      	latitude: 0,
+      	longitude: 0,
       },
     };
+  }
+
+  watchID: ?number = null
+
+  componentDidMount(){
+  	navigator.geolocation.getCurrentPosition((position) => {
+  		var lat = parseFloat(position.coords.latitude)
+  		var long = parseFloat(position.coords.longitude)
+
+  		var initialRegion = {
+  			latitude: lat,
+  			longitude: long,
+  			latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+  		}
+
+  		this.setState({initialPosition: initialRegion})
+  		this.setState({markerPosition: initialRegion})
+
+  	},(error) => alert(JSON.stringify(error)), {
+  		enableHighAccuracy: true,
+  		timeout: 20000, 
+  		maximumAge: 1000
+  	})
+
+  	this.watchID = navigator.geolocation.watchPosition((position) => {
+			var lat = parseFloat(position.coords.latitude)
+			var long = parseFloat(position.coords.longitude)
+  		
+  		var lastRegion = {
+  			latitude: lat,
+  			longitude: long,
+  			latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+  		}
+
+  		this.setState({initialPosition: lastRegion})
+  		this.setState({markerPosition: lastRegion})
+  	})
+  }
+
+  componentWillUnmount(){
+  	navigator.geolocation.clearWatch(this.watchID)
   }
   
   get resources(){
@@ -85,7 +137,7 @@ static navigationOptions= ({navigation}) =>({
           zoomEnabled={true}
           pitchEnabled={true}
           rotateEnabled={true}
-          initialRegion={this.state.region}
+          region={this.state.initialPosition}
       >
           
           {this.resources.map((pin, index) =>
